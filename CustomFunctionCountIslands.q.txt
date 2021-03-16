@@ -1,0 +1,64 @@
+/
+*********Question 3: Custom Function for counting islands of 1 ****************
+Input:11100110001001 -> Function ??? -> Output:11100220003004
+\
+
+/Approach-I: Functional Approach - This function updates the list by tracking 0 to 1 changes in thelist 
+f_in:{[L]     
+    
+    /catch 0->1 changes in the list
+    index: where (deltas L)=1; index: index, count L; $[first L = 0; [;]; [index: 1_ index;]];
+    
+    i:0;n:1;
+    do[(count index) - 1;          
+        /Filter elements = 1 that need to be updated. 
+        L[index[i] + where L[index[i] + til (index[i+1] - index[i])]=1]+:(n+i);                
+        i+:1;       
+    ];   
+    L
+}
+
+/considering the corner cases with 1 elements in the list where delta fails. Hence handled it through another function
+update_list:{[L]
+    $[ (count L) > 2;[L: f_in[L];];];L
+}
+
+L0:0
+uL0: update_list[L0]
+uL0
+
+L1:1
+uL1: update_list[L1]
+uL1
+
+L2: 1 1 1 0 0 1 1 0 0 0 1 0 0 1
+uL2: update_list[L2]
+uL2
+
+L3: 1 1 1 0 0 1 1 0 0 0 1 0 0 1 1 0 1 0 0 1 1 1 1
+uL3: update_list[L3]
+uL3
+
+L4: 0 0 1 1 1 1 0 1 0 0 0 1 0 0 
+uL4: update_list[L4]   
+uL4
+
+/
+Approach-II: More KDBish solution 
+Input:11100110001001 -> Function ??? -> Output:11100220003004
+\
+
+l:1 1 1 0 0 1 1 0 0 0 1 0 0 1;
+
+split_lists: (where (deltas l)=1) cut l; 
+split_lists;
+
+update_ones_in_list: {[p;l] l[where l=1]:p;l};
+
+p:0;
+update_ones:{`p set p+:1; split_lists[p-1]: update_ones_in_list[p; split_lists[p-1]]; l_out[p-1]};
+
+update_ones each split_lists;
+outList: raze split_lists;
+outList;
+
